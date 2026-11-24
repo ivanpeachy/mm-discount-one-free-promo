@@ -1,0 +1,25 @@
+api_version = "2026-10"
+
+[[extensions]]
+name = "Product promotion with quantity cap"
+handle = "one-free-item"
+type = "function"
+uid = "f93e5ba6-f25e-63db-b44a-90fe0919715433c43ae5"
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "cart.lines.discounts.generate.run"
+input_query = "src/cart_lines_discounts_generate_run.graphql"
+export = "cart-lines-discounts-generate-run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+[extensions.ui]
+handle = "promo-settings"
+
+[extensions.input.variables]
+namespace = "$app"
+key = "function-configuration"
+

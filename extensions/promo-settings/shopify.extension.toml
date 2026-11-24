@@ -1,0 +1,16 @@
+api_version = "2026-10"
+[[extensions]]
+# Change the merchant-facing name of the extension in locales/en.default.json
+name = "Product promotion with quantity cap"
+description = "t:description"
+handle = "promo-settings"
+uid = "95f64428-f0ad-9b7e-62d5-74a608e8bc63d9c52355"
+type = "ui_extension"
+# Only 1 target can be specified for each Admin block extension
+[[extensions.targeting]]
+module = "./src/DiscountSettings.jsx"
+target = "admin.discount-details.function-settings.render"
+
+[[extensions.metafields]]
+namespace = "$app"
+key = "function-configuration"
