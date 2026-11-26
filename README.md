@@ -26,6 +26,43 @@ Press P to open the URL to your app. Once you click install, you can start devel
 
 Local development is powered by [Shopify CLI](https://shopify.dev/docs/apps/build/cli-for-apps/test-apps-locally). It logs into your account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
 
+## Deploy and install
+
+Shopify hosts the `one-free-item` Discount Function and the `promo-settings` admin UI extension. A live store needs Shopify Plus to run the Discount Function through a custom app. [Shopify Functions availability](https://shopify.dev/docs/api/functions/latest)
+
+### 1. Prepare the build
+
+Use Node.js 24 LTS, pnpm, and Shopify CLI. Check `node -v` before deploying. Node.js 23.6.1 fails during GraphQL type generation in this project.
+
+On macOS with Homebrew, install and select Node.js 24 if needed. [Homebrew Node.js 24 package](https://formulae.brew.sh/formula/node@24)
+
+```sh
+brew install node@24
+export PATH="$(brew --prefix node@24)/bin:$PATH"
+node -v
+```
+
+From the repository root, run `pnpm install --frozen-lockfile` if dependencies are missing or the lockfile has changed.
+
+### 2. Link the app and release a version
+
+If you need to link the project to a Shopify app, run `shopify app config link` from the repository root. Select the organization that should own the app, then select an existing app or create a new one. Choose a configuration name when prompted. Check that the linked TOML includes the scopes and `[discount.metafields.app.function-configuration]` definition from [the reference config](./shopify.app.one-free-promo.toml). Keep the linked app's Client ID. [Shopify app configuration guide](https://shopify.dev/docs/apps/build/cli-for-apps/manage-app-config-files)
+
+From the repository root, replace `YOUR_CONFIG_NAME` with the name you chose when linking the app. For a file named `shopify.app.<name>.toml`, use the `<name>` portion. Confirm the organization and app in the CLI prompt. The command builds both extensions and releases a version. In the Dev Dashboard, open **Apps → your app → Versions** and check for the **Active** badge. [Shopify app version deployment](https://shopify.dev/docs/apps/launch/deployment/deploy-app-versions)
+
+```sh
+shopify app deploy --config YOUR_CONFIG_NAME
+```
+
+### 3. Install on the live store
+
+1. In **Dev Dashboard → Apps**, open your app and select **Distribution**. For the first installation, choose **Custom distribution** and confirm. Shopify locks the distribution method once selected. The **Test app** button is for development stores. [Shopify custom distribution](https://shopify.dev/docs/apps/launch/distribution/select-distribution-method)
+2. Open **Manage custom install link**, enter the store's `myshopify.com` domain, and click **Generate link**. If the store belongs to a different organization, configure the required IP allowlist before installation. [IP allowlist for extension-only apps](https://shopify.dev/docs/apps/build/app-extensions/build-extension-only-app#meet-the-ip-allowlist-requirement)
+3. Open the link while signed in as the store owner, review the permissions, and click **Install**.
+4. In the store admin, go to **Discounts → Create discount → Product promotion with quantity cap**. Configure and save the promotion, then test it at checkout with an eligible cart.
+
+For subsequent releases, run the same deploy command. Installed stores receive the active version automatically. [Shopify app version deployment](https://shopify.dev/docs/apps/launch/deployment/deploy-app-versions)
+
 ## How it works
 
 ### Authentication
